@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: check-commit-msg-template
+        name: Commit message must follow template
+        entry: python -X utf8 check_commit_msg_type.py
+        language: system
+        pass_filenames: true
+        stages: [commit-msg]

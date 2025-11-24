@@ -1,0 +1,47 @@
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+
+# -----------Description----------
+
+# <type>과 <subject>는 필수이며, 이외는 선택 사항임.
+
+# type은 다음과 같은 예약어만 사용함.
+
+# feat: 새로운 기능 추가
+# fix: 버그 수정
+# docs: 문서 수정(README.md, API 문서, ...)
+# style: 코드 포맷, 세미 콜론 수정 등(코드 수정이 없는 경우)
+# refactor: 모듈화 등의 코드 리팩토링
+# test: 테스트 추가, 수정
+# chore: 빌드 프로세스, 패키지 관리자 수정 등
+
+# scope
+# 변경된 파일이나 모듈의 이름을 지정함.
+
+# subject
+# 변경 내용을 간단하게 설명함.
+
+# body
+# 상세한 내용을 설명함.
+
+# footer
+# BREAKING CHANGE와 같이 중요한 변경 사항을 강조함.
+
+# -----------Example 1------------
+
+# feat(auth): add user authentication using JWT
+
+# -----------Example 2------------
+
+# fix: prevent racing of requests
+
+# Introduce a request id and a reference to latest request. Dismiss
+# incoming responses other than from latest request.
+
+# Remove timeouts which were used to mitigate the racing issue but are
+# obsolete now.
+
+# BREAKING CHANGE: The `user` table schema has changed. You need to migrate your database to the new schema.
