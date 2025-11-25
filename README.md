@@ -89,19 +89,19 @@ src/modules/{module-name}/
 각 모듈 폴더(src/modules/{module-name})에는 아래 템플릿으로 README.md를 작성합니다.
 
 ```
-🧩 {module-name}
+# 🧩 {module-name}
 
 기능 설명
 이 모듈이 어떤 문제를 해결하는지 또는 어떤 기능을 제공하는지 간단히 작성합니다.
 
-📁 구조
+## 📁 구조
 src/modules/{module-name}/
   index.tsx
   hooks.ts (optional)
   utils.ts (optional)
   README.md
 
-🚀 사용법
+## 🚀 사용법
 1) 설치/필요 라이브러리
 npm install ...
 
@@ -112,23 +112,23 @@ export default function Page() {
   return <Something />;
 }
 
-🔍 Playground 페이지
+## 🔍 Playground 페이지
 
 Playground를 제공한 경우:
 
 주소:
 /modules/{module-name}
 
-📝 참고 사항
+## 📝 참고 사항
 
 제약 사항, 버전 호환성, 대체 가능 패턴 등을 간단히 작성합니다.
 
-🚀 로컬 실행 방법
+## 🚀 로컬 실행 방법
 npm install
 npm run dev
 
 
 실행 후 아래 주소로 접근해 모듈별 데모를 확인할 수 있습니다.
 
-http://localhost:3000/modules
+http://localhost:3000/
 ```

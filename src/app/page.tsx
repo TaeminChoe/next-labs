@@ -8,19 +8,9 @@ interface ModuleItem {
 
 const modules: ModuleItem[] = [
   {
-    name: "auth-basic",
-    path: "/modules/auth-basic",
-    description: "가장 기본적인 인증 흐름을 다루는 예제 모듈입니다.",
-  },
-  {
-    name: "table-mrt",
-    path: "/modules/table-mrt",
-    description: "Material React Table 기반의 테이블 구현 예제입니다.",
-  },
-  {
-    name: "chart-pie",
-    path: "/modules/chart-pie",
-    description: "Recharts를 활용한 파이 차트 시각화 예제입니다.",
+    name: "react-hook-form",
+    path: "/modules/react-hook-form",
+    description: "프로젝트에서 필요한 다양한 Input을 관리하는 예제 모듈입니다.",
   },
 ];
 
