@@ -1,7 +1,8 @@
 // Primitive
 
 // Molecule
-import { default as CodeBlock } from "./molecule/CodeBlock";
+export { default as CodeBlock } from "./molecule/CodeBlock";
 
 // Organism
-import { default as DemoLayout } from "./organism/DemoLayout";
+export { default as DemoLayout } from "./organism/DemoLayout";
+export { default as Provider } from "./organism/Provider";

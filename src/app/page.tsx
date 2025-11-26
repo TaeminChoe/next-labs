@@ -10,7 +10,12 @@ const modules: ModuleItem[] = [
   {
     name: "react-hook-form",
     path: "/modules/react-hook-form",
-    description: "프로젝트에서 필요한 다양한 Input을 관리하는 예제 모듈입니다.",
+    description: "프로젝트에서 필요한 다양한 Input을 관리하는 모듈입니다.",
+  },
+  {
+    name: "auth",
+    path: "/modules/auth",
+    description: "Auth로직을 관리하는 모듈입니다.",
   },
 ];
 
