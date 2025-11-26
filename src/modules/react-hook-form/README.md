@@ -1,10 +1,74 @@
-# 🧩 react-hook-form
+# 🧩 React Hook Form Input System
 
-react-hook-form이라는 라이브러리를 활용해서 input요소를 관리합니다.
+**Next.js + TailwindCSS 기반 UI 입력 시스템 모듈**
 
-다양한 타입의 Input 요소를 관리하여 프로젝트 내의 모든 Input에 대응할 수 있도록 작성하는 것이 목표입니다.
+이 모듈은 **react-hook-form**을 기반으로 다양한 Input 요소(Text, Select, Date, File, Toggle 등)를  
+**일관된 API, 일관된 UI, 일관된 이벤트 처리 방식**으로 사용할 수 있도록 구성된 입력 시스템입니다.
 
-## 📁 구조
+프로젝트 전체의 Input 컴포넌트를 표준화하여,  
+중복 코드와 스타일 불일치를 제거하고 유지보수성을 높이는 것을 목표로 설계되었습니다.
+
+---
+
+## 📑 목차
+
+- [특징](#특징-features)
+- [폴더 구조](#폴더-구조)
+  - [각 폴더 설명](#각-폴더-설명)
+- [설치](#설치)
+  - [의존 라이브러리 설치](#1-의존-라이브러리-설치)
+  - [전역 스타일 등록](#2-전역-스타일-등록)
+- [빠른 시작 (Quick Start)](#빠른-시작-quick-start)
+- [Input Components 상세 설명](#input-compoennts-상세-설명)
+  - [Props > wrapperClassName 활용 예시](#props-wrapperclassname-활용-예시)
+  - [Props > labelClassName 활용 예시](#props-labelclassname-활용-예시)
+  - [Props > inputLayoutClassName 활용 예시](#props-inputlayoutclassname-활용-예시)
+  - [활용법](#활용법)
+- [InputTextBox](#inputtextbox)
+  - [기본 테스트 입력](#1-기본-테스트-입력)
+  - [비밀번호 입력](#2-비밀번호-입력)
+  - [텍스트 영역 입력](#3-텍스트-영역-입력)
+  - [숫자 입력](#4-숫자-입력)
+- [InputSelectBox](#inputselectbox)
+- [InputDateBox / InputDateRangeBox](#inputdatebox--inputdaterangebox)
+  - [단일 날짜 입력](#1-단일-날짜-입력)
+  - [범위 날짜 입력](#2-범위-날짜-입력)
+- [InputEditorBox](#inputeditorbox)
+- [InputFileBox](#inputfilebox)
+  - [단일 파일 업로드](#1-단일-파일-업로드)
+  - [다중 파일 업로드](#2-다중-파일-업로드)
+- [InputToggleBox](#inputtogglebox)
+- [InputSingleCheckbox](#inputsinglecheckbox)
+- [InputMultiCheckbox](#inputmulticheckbox)
+- [InputRadioGroupBox](#inputradiogroupbox)
+- [InputTagBox](#inputtagbox)
+- [InputLayout (공통 레이아웃 시스템)](#inputlayout-공통-레이아웃-시스템)
+- [validation / format](#validation--format)
+  - [validation](#validation)
+  - [format](#format)
+  - [validation, format 적용](#validation-format-적용)
+- [Playground](#playground)
+- [로컬 실행](#로컬-실행)
+- [주의 사항](#주의-사항)
+- [Version](#version)
+
+---
+
+## 📌 특징 (Features)
+
+- **react-hook-form 완전 호환**
+- **Text / Select / Date / DateRange / Editor / File / Toggle / Checkbox 등 10+ 타입 지원**
+- 모든 Input에 동일한 API 구조(`name`, `label`, `register`, `error`, `validationRules`)
+- **공통 InputLayout 기반**  
+  → label, error, description, spacing 일관화
+- **자동 코드 스니펫 Playground 제공**
+- **TailwindCSS + clsx + tailwind-merge** 기반 스타일
+- 타입 안정성(TypeScript 100% 지원)
+- 프로젝트 공통 UI와 자연스럽게 통합되도록 설계
+
+---
+
+## 📁 폴더 구조
 
 ```
 ./src/modules/react-hook-form/
@@ -45,22 +109,39 @@ react-hook-form이라는 라이브러리를 활용해서 input요소를 관리�
     `-- index.ts
 ```
 
-- components : Input요소로 사용될 컴포넌트들과 내부에서 사용되는 컴포넌트
-- format : 휴대폰, 사업자 번호와 같이 포맷이 필요한 데이터 형식 정의
-- styles : textEditor에서 사용되는 react-quill과 날짜 형식에서 사용되는 datepicker의 커스텀 css
-- types : 내부에서 사용되는 타입 정의
-- ui : 컴포넌트에서 공용으로 활용되는 UI 컴포넌트
-  - 이후 react-hook-form모듈을 가져갈 때, 프로젝트에 공용 UI에 합류시키길 권장
+### 각 폴더 설명
 
-## 🚀 사용법
+| 폴더        | 설명                                         |
+| ----------- | -------------------------------------------- |
+| components  | Input 요소로 사용될 컴포넌트들               |
+| format      | 휴대폰/사업자번호 등 포맷 함수               |
+| styles      | react-quill / react-datepicker 커스텀 스타일 |
+| types       | 모든 컴포넌트 공통 타입 정의                 |
+| ui          | 아이콘 및 내부 공용 UI                       |
+| validations | 검증 함수 (phone, email 등)                  |
 
-1. 설치/필요 라이브러리
+---
 
-```shell
+## 🚀 설치
+
+### 1) 의존 라이브러리 설치
+
+```bash
 npm install tailwind-merge clsx react-hook-form react-quill date-fns react-datepicker react-quill-new
 ```
 
-2. 기본 코드 예시
+### 2) 전역 스타일 등록
+
+`globals.css` 또는 `_app.tsx`에 CSS import:
+
+```css
+@import "@/modules/react-hook-form/styles/react-quill.css";
+@import "@/modules/react-hook-form/styles/react-datepicker.css";
+```
+
+---
+
+## ⚡ 빠른 시작 (Quick Start)
 
 ```tsx
 import { useForm } from "react-hook-form";
@@ -75,17 +156,11 @@ export default function Page() {
   const {
     register,
     handleSubmit,
-    getValues,
     setValue,
-    control,
-    reset,
     watch,
     formState: { errors },
   } = useForm<FormData>({
     mode: "onChange",
-    defaultValues: {
-      country: "",
-    },
   });
 
   const onSubmit = (data: FormData) => {
@@ -101,6 +176,7 @@ export default function Page() {
         validationRules={{ required: "기업명을 입력해주세요." }}
         error={errors.companyName?.message}
       />
+
       <InputSelectBox
         label="국가"
         name="country"
@@ -112,81 +188,99 @@ export default function Page() {
         ]}
         value={watch("country")}
         onChange={v =>
-          setValue("country", v, {
-            shouldDirty: true,
-            shouldValidate: true,
-          })
+          setValue("country", v, { shouldDirty: true, shouldValidate: true })
         }
         placeholder="국가를 선택해주세요"
         validationRules={{ required: "국가를 선택해주세요" }}
         error={errors.country?.message}
-        description={`*선택한 국가를 기준으로\n정보가 자동 설정됩니다.`}
       />
     </form>
   );
 }
 ```
 
-## 🔍 Playground 페이지
+---
 
-> /modules/react-hook-form
+## 🧱 Input Compoennts 상세 설명
 
-## 📝 참고 사항
+공통 Props 규칙
 
-### 지원되는 타입
+모든 Input은 아래의 공통 props를 지원합니다.
 
-- Text
+| Props                  | Type                                   | Description             |
+| ---------------------- | -------------------------------------- | ----------------------- |
+| `label`                | string                                 | 입력 필드 라벨          |
+| `name`                 | string                                 | react-hook-form name    |
+| `register`             | ReturnType<typeof useForm>["register"] | RHF register            |
+| `error`                | string                                 | 에러 메시지             |
+| `validationRules`      | RegisterOptions                        | RHF 규칙                |
+| `description`          | string                                 | 라벨 아래 표시되는 설명 |
+| `required`             | boolean                                | 필수 여부 표시          |
+| `wrapperClassName`     | string                                 | 전체 레이아웃 className |
+| `labelClassName`       | string                                 | 라벨영역 className      |
+| `inputLayoutClassName` | string                                 | Input영역 ClassName     |
 
-  - 기본 텍스트 입력
-  - 숫자 입력(Number)
-  - 비밀번호 입력(Password)
-  - 텍스트 영역(Textarea)
+### Props > wrapperClassName 활용 예시
 
-- Date
+Label과 Input을 Inline 혹은 Block형태로 나누고 싶을 때 커스텀
 
-  - 단일 날짜 선택
-  - 날짜 범위 선택(Date Range)
+```tsx
+<InputTextBox
+  label="기업명"
+  name="companyName"
+  register={register}
+  validationRules={{ required: "기업명을 입력해주세요." }}
+  error={errors.companyName?.message}
+  // wrapperClassName="flex-col" // inline(default) or Block
+/>
+```
 
-- Editor
+Inline(Default)
 
-  - Rich Text 기반 에디터(HTML 출력)
-  - 기본적인 문단/리스트/굵기/링크 등 서식 지원
+![inlinelayout](/public/images/react-hook-form/inlineLayoutExam.png)
 
-- Files
+Block(주석 해제 버전)
 
-  - 단일 파일 업로드
-  - 다중 파일 업로드
-  - 파일명/용량 검증 가능
+![blockLayoutExam](/public/images/react-hook-form/blockLayoutExam.png)
 
-- Multi Checkbox
+### Props > labelClassName 활용 예시
 
-  - 여러 옵션을 체크하여 배열 형태로 값 반환
+여러 Input들의 label길이를 통일할 때 사용
 
-- Radio Group Checkbox
+```tsx
+<InputTextBox
+  label="기업명"
+  name="companyName"
+  register={register}
+  validationRules={{ required: "기업명을 입력해주세요." }}
+  error={errors.companyName?.message}
+  labelClassName="min-w-50"
+/>
+```
 
-  - 여러 옵션 중 단일 선택
-  - 시각적으로 체크박스 형태를 활용하는 타입
+![labelClassNameExam](/public/images/react-hook-form/labelClassNameExam.png)
 
-- Select
+### Props > inputLayoutClassName 활용 예시
 
-  - 드롭다운으로 옵션 선택
-  - 단일 선택·다중 선택 모두 지원 가능
+InputTagBox사용 시 Input과 Tag의 레이아웃을 지정
 
-- Single Checkbox
+```tsx
+<InputTagBox
+  label="키워드"
+  name="keywords"
+  register={register}
+  setValue={setValue}
+  watch={watch}
+  validationRules={tagBoxValidation<FormData>()}
+  error={errors.keywords?.message}
+  description="기술 스택 또는 관심 키워드를 태그로 입력하세요. (예: react, nextjs)"
+  inputLayoutClassName="flex flex-col gap-1"
+/>
+```
 
-  - true/false를 선택하는 기본 체크박스
+![inputClassNameExam](/public/images/react-hook-form/inputClassNameExam.png)
 
-- Tag
-
-  - 사용자가 임의의 텍스트를 입력해 키워드를 추가/삭제할 수 있는 입력 타입 (태그 리스트 형태로 값 관리)
-
-- Toggle
-  - 스위치 형태의 on/off 입력 방식
-  - boolean 값 처리
-
-### 활용법
-
-사용하고자 하는 Input 참조 후, 마우스 가져다 대서 하는 방법 소개
+## 활용법
 
 1. 활용하고자 하는 페이지에 useForm을 선언하고, 필요한 데이터의 타입을 선언
 
@@ -230,7 +324,7 @@ import {
 
 3. 코드내에 컴포넌트 임의로 작성 후 마우스를 컴포넌트 위로 마우스오버시 예시코드 표출
 
-![자동완성 예시](/public/images/react-hook-form-exam01.png)
+![자동완성 예시](/public/images/react-hook-form/react-hook-form-exam01.png)
 
 4. 예시코드를 가져와 코드에 붙여넣고 name 등을 미리 정의한 타입에 맞게 수정
 
@@ -244,11 +338,311 @@ import {
 />
 ```
 
-### 공통 레이아웃 수정
+---
 
-Label, Input들의 공통 레이아웃인 InputLayout컴포넌트를 수정하여 공통 레이아웃을 구성한다.
+## 🔤 InputTextBox
+
+텍스트/비밀번호/숫자/텍스트영역 등을 처리하는 기본 입력 컴포넌트입니다.
+
+### 1. 기본 테스트 입력
 
 ```tsx
+<InputTextBox
+  label="기업명"
+  name="companyName"
+  register={register}
+  validationRules={{ required: "기업명은 필수입니다." }}
+  error={errors.companyName?.message}
+/>
+```
+
+### 2. 비밀번호 입력
+
+```tsx
+<InputTextBox
+  label="비밀번호"
+  name="password"
+  type="password"
+  register={register}
+  validationRules={passwordValidation<FormData>()}
+  placeholder="********"
+  error={errors.password?.message}
+/>
+```
+
+### 3. 텍스트 영역 입력
+
+```tsx
+<InputTextBox
+  label="설명"
+  name="description"
+  register={register}
+  placeholder="내용을 입력해주세요"
+  textarea
+  validationRules={{ required: "설명을 입력해주세요" }}
+  error={errors.description?.message}
+  description={`설명은 회사 내부 참고 목적으로 사용됩니다.`}
+/>
+```
+
+### 4. 숫자 입력
+
+```tsx
+<InputTextBox
+  label="휴대폰번호"
+  name="phone"
+  type="number"
+  register={register}
+  placeholder=""
+  validationRules={{ required: "휴대본번호를 입력해주세요" }}
+  description={"휴대폰 번호는 -없이 숫자만 입력해주세요."}
+  error={errors.age?.message}
+/>
+```
+
+---
+
+## 🔽 InputSelectBox
+
+```tsx
+<InputSelectBox
+  label="국가"
+  name="country"
+  register={register}
+  options={[
+    { label: "대한민국", value: "kr" },
+    { label: "미국", value: "us" },
+    { label: "일본", value: "jp" },
+  ]}
+  value={watch("country")}
+  onChange={v =>
+    setValue("country", v, {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+  }
+  placeholder="국가를 선택해주세요"
+  validationRules={{ required: "국가를 선택해주세요" }}
+  error={errors.country?.message}
+  description={`*선택한 국가를 기준으로\n정보가 자동 설정됩니다.`}
+/>
+```
+
+---
+
+## 📅 InputDateBox / InputDateRangeBox
+
+react-datepicker 기반 날짜 선택 컴포넌트.
+
+### 1. 단일 날짜 입력
+
+```tsx
+<InputDateBox
+  label="생년월일"
+  name="birthDate"
+  register={register}
+  value={watch("birthDate")}
+  setValue={setValue}
+  validationRules={{ required: "날짜를 선택해주세요." }}
+  error={errors.birthDate?.message}
+  description="날짜를 선택해주세요."
+/>
+```
+
+### 2. 범위 날짜 입력
+
+```tsx
+<InputDateRangeBox
+  label="기간 선택"
+  name="period"
+  register={register}
+  value={watch("period")}
+  setValue={setValue}
+  validationRules={dateRangeBoxValidation<FormData>()}
+  error={errors.period?.message}
+  description="시작일과 종료일을 선택하세요. (예: 2025-06-20 ~ 2025-06-26)"
+/>
+```
+
+---
+
+## 📝 InputEditorBox
+
+react-quill 기반 리치 텍스트 에디터.
+
+```tsx
+<InputEditorBox
+  setValue={setValue}
+  watch={watch}
+  label="게시글"
+  trigger={trigger}
+  name="contents"
+  register={register}
+  validationRules={{ required: "게시글을 입력해주세요." }}
+  error={errors.contents?.message}
+/>
+```
+
+---
+
+## 📁 InputFileBox
+
+단일 / 다중 파일 업로드 지원.
+
+### 1. 단일 파일 업로드
+
+```tsx
+<InputFileBox
+  label="프로필 이미지"
+  name="avatar"
+  register={register}
+  watch={watch}
+  setValue={setValue}
+  control={control}
+  validationRules={singleFileBoxValidation<FormData>()}
+  error={errors.avatar?.message}
+  description="최대 5MB 이하의 이미지 파일만 업로드할 수 있습니다."
+/>
+```
+
+### 2. 다중 파일 업로드
+
+```tsx
+<InputFileBox
+  label="첨부파일"
+  name="attachments"
+  register={register}
+  watch={watch}
+  control={control}
+  setValue={setValue}
+  multiple
+  validationRules={MultiFileBoxValidation<FormData>()}
+  error={errors.attachments?.message}
+  description="여러 파일을 동시에 업로드할 수 있습니다."
+/>
+```
+
+---
+
+## 🔘 InputToggleBox
+
+boolean 스위치 UI.
+
+```tsx
+<InputToggleBox
+  label="알림 허용"
+  name="enableNotification"
+  register={register}
+  validationRules={{ required: "알림을 허용해주세요." }}
+  error={errors.enableNotification?.message}
+  description={`브라우저에서 알림을 수신할 수 있도록 설정합니다.\n(언제든 설정에서 변경 가능)`}
+/>
+```
+
+---
+
+## 🔳 InputSingleCheckbox
+
+```tsx
+<InputSingleCheckBox
+  name="agreePrivacy"
+  // label={"개인정보제공"}
+  register={register}
+  description={
+    <>
+      <span>개인정보 수집 및 이용에 동의합니다. </span>
+      <a href="#" className="text-blue-600 underline">
+        (자세히 보기)
+      </a>
+    </>
+  }
+  validationRules={{ required: "동의가 필요합니다." }}
+  error={errors.agreePrivacy?.message}
+/>
+```
+
+---
+
+## 🔲 InputMultiCheckbox
+
+```tsx
+<InputMultiCheckBox
+  label="선호하는 언어"
+  name="languages"
+  register={register}
+  watch={watch}
+  options={[
+    { label: "JavaScript", value: "js" },
+    { label: "Python", value: "py" },
+    { label: "Go", value: "go" },
+    { label: "Rust", value: "rust" },
+  ]}
+  validationRules={multiCheckBoxValidation<FormData>()}
+  error={errors.languages?.message}
+/>
+```
+
+---
+
+## 🔘 InputRadioGroupBox
+
+```tsx
+<InputRadioGroupBox
+  label="성별"
+  name="gender"
+  options={[
+    { label: "남성", value: "male" },
+    { label: "여성", value: "female" },
+  ]}
+  watch={watch}
+  register={register}
+  validationRules={{ required: "성별을 선택해주세요." }}
+  error={errors.gender?.message}
+  description="성별을 선택해주세요"
+/>
+```
+
+---
+
+## 🏷 InputTagBox
+
+```tsx
+<InputTagBox
+  label="키워드"
+  name="keywords"
+  register={register}
+  setValue={setValue}
+  watch={watch}
+  validationRules={tagBoxValidation<FormData>()}
+  error={errors.keywords?.message}
+  description="기술 스택 또는 관심 키워드를 태그로 입력하세요. (예: react, nextjs)"
+  inputLayoutClassName="flex flex-col gap-1"
+/>
+```
+
+---
+
+## 🎨 InputLayout (공통 레이아웃 시스템)
+
+모든 Input은 공통 InputLayout을 기반으로 동일한 구조로 표시됩니다.
+
+```tsx
+// InputLayout.tsx
+import { ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
+import clsx from "clsx";
+
+interface Props {
+  label?: string;
+  children: ReactNode;
+  description?: string | React.ReactNode;
+  error?: string;
+  wrapperClassName?: string;
+  labelClassName?: string;
+  inputLayoutClassName?: string;
+  required?: boolean;
+}
+
 export default function InputLayout({
   label,
   children,
@@ -294,8 +688,7 @@ export default function InputLayout({
 
           {/* Error */}
           <p
-            className={`
-              mt-1 text-xs text-red-500
+            className={`mt-1 text-xs text-red-500
               ${error ? "block" : "hidden"}
             `}
           >
@@ -308,15 +701,107 @@ export default function InputLayout({
 }
 ```
 
-## 🚀 로컬 실행 방법
+---
 
+## 🔍 validation / format
+
+자주 사용하는 형식의 validation과 format을 미리 선언해두고, Input요소에 활용
+
+아래는 예시로 휴대폰 번호를 입력받는 Input을 생성하는 예제
+
+### validation
+
+000-0000-0000 형식을 지키는지 확인하는 validation
+
+```tsx
+export const phoneNumberValidation = <
+  T extends FieldValues
+>(): RegisterOptions<T> => ({
+  required: "연락처를 입력해주세요",
+  pattern: {
+    value: /^\d{3}-\d{3,4}-\d{4}$/,
+    message: "연락처는 숫자 11자리이어야 합니다.",
+  },
+});
 ```
-npm install
-npm run dev
+
+### format
+
+input에 입력될 때마다 실행되어 입력된 값을 관리
+
+```tsx
+export const formatPhoneNumber = (
+  value: string,
+  prevValue: string
+): string | undefined => {
+  const digits = value.replace(/\D/g, ""); // 숫자만 추출
+
+  // 숫자 외 문자가 들어오면 입력 무시
+  if (!/^\d*$/.test(digits)) {
+    return undefined;
+  }
+
+  // 자리 수에 따라 포맷팅
+  if (digits.length <= 3) {
+    return digits;
+  } else if (digits.length <= 7) {
+    return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+  } else if (digits.length <= 11) {
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  } else {
+    // 11자리까지만 허용
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+  }
+};
+```
+
+### validation, format 적용
+
+```tsx
+<InputTextBox
+  label="연락처"
+  name="phoneNumber"
+  register={register}
+  validationRules={phoneNumberValidation<FormData>()} // 휴대폰번호 validation
+  format={formatPhoneNumber} // 휴대폰번호 format
+  description={"연락처는 -없이 숫자만 입력해주세요."}
+  error={errors.phoneNumber?.message}
+/>
 ```
 
 ---
 
-실행 후 아래 주소로 접근해 모듈별 데모를 확인할 수 있습니다.
+## 🧪 Playground
 
-http://localhost:3000/
+`/modules/react-hook-form` 경로에서 모든 Input 작동 예시 + 코드 스니펫 확인 가능.
+
+---
+
+## 🖥 로컬 실행
+
+```bash
+npm install
+npm run dev
+```
+
+접속:
+
+```
+http://localhost:3000
+```
+
+---
+
+## 📌 주의 사항
+
+- react-quill은 SSR에서 dynamic import 필요
+- Datepicker는 timezone 처리 필요
+- File 업로드 시 FormData 구성 주의
+
+---
+
+## 📄 Version
+
+v1.0.0 — 2025.11
+
+작성자: 최태민

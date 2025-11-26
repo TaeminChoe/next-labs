@@ -58,8 +58,7 @@ export default function InputLayout({
 
           {/* Error */}
           <p
-            className={`
-              mt-1 text-xs text-red-500
+            className={`mt-1 text-xs text-red-500
               ${error ? "block" : "hidden"}
             `}
           >

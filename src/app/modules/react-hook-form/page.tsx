@@ -20,6 +20,7 @@ import {
   tagBoxValidation,
   MultiFileBoxValidation,
   formatPhoneNumber,
+  InputEditorBox,
 } from "@/modules/react-hook-form";
 import { demoPageCode } from "./codeSnippets";
 import DemoLayout from "@/ui/organism/DemoLayout";
@@ -40,6 +41,7 @@ interface FormData {
   phoneNumber: string;
   password: string;
   passwordConfirm: string;
+  contents: string;
 }
 
 export default function DemoPage() {
@@ -50,6 +52,7 @@ export default function DemoPage() {
     setValue,
     control,
     reset,
+    trigger,
     watch,
     formState: { errors },
   } = useForm<FormData>({
@@ -215,11 +218,10 @@ export default function DemoPage() {
             label="연락처"
             name="phoneNumber"
             register={register}
-            placeholder=""
             validationRules={phoneNumberValidation<FormData>()}
+            format={formatPhoneNumber}
             description={"연락처는 -없이 숫자만 입력해주세요."}
             error={errors.phoneNumber?.message}
-            format={formatPhoneNumber}
           />
           <InputTextBox
             label="비밀번호"
@@ -245,6 +247,16 @@ export default function DemoPage() {
               },
             }}
             error={errors.passwordConfirm?.message}
+          />
+          <InputEditorBox
+            setValue={setValue}
+            watch={watch}
+            label="게시글"
+            trigger={trigger}
+            name="contents"
+            register={register}
+            validationRules={{ required: "게시글을 입력해주세요." }}
+            error={errors.contents?.message}
           />
 
           {/* 버튼 영역 */}

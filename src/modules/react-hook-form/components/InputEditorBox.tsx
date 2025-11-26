@@ -19,6 +19,36 @@ interface Props<T extends FieldValues> extends InputProps<T> {
   labelClassName?: string;
 }
 
+/**
+ * InputEditorBox 사용 예시
+ *
+ * ```tsx
+ *   const {
+ *     register,
+ *     watch,
+ *     setValue,
+ *     trigger,
+ *     handleSubmit,
+ *     formState: { errors },
+ *   } = useForm<FormValues>();
+ *
+ *   return (
+ *     <form onSubmit={handleSubmit(onSubmit)}>
+ *      <InputEditorBox
+ *        setValue={setValue}
+ *        watch={watch}
+ *        label="게시글"
+ *        trigger={trigger}
+ *        name="contents"
+ *        register={register}
+ *        validationRules={{ required: "게시글을 입력해주세요." }}
+ *        error={errors.contents?.message}
+ *       />
+ *     </form>
+ *   )
+ * ```
+ */
+
 export default function InputEditorBox<T extends FieldValues>({
   label,
   name,
