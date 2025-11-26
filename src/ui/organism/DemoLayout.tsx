@@ -1,3 +1,4 @@
+"use client";
 import { useState, ReactNode } from "react";
 import CodeBlock from "../molecule/CodeBlock";
 
