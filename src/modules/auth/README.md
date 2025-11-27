@@ -661,3 +661,59 @@ npm run dev
 이후 아래 주소로 접근:
 
 http://localhost:3000/
+
+---
+
+<a id="optional-generate-route"></a>
+
+## 🔧 (Optional) Auth API 라우트 자동 생성 스크립트
+
+`src/app/api/auth` 내부에  
+`login / logout / me / refresh` 라우트를 만들 때  
+매번 폴더 구조를 생성하고 `route.ts` 파일을 작성하는 과정이 반복됩니다.
+
+아래는 **필요할 때 참고용으로 사용 가능한 간단한 스크립트**입니다.  
+프로젝트 루트에서 실행하면 자동으로 4개의 라우트 파일을 생성합니다.
+
+```sh
+API_PATH="src/app/api/auth"
+
+ROUTES=("login" "logout" "me" "refresh")
+
+declare -A MAP
+MAP["login"]="loginRoute"
+MAP["logout"]="logoutRoute"
+MAP["me"]="meRoute"
+MAP["refresh"]="refreshRoute"
+
+declare -A METHOD
+METHOD["login"]="POST"
+METHOD["logout"]="POST"
+METHOD["me"]="GET"
+METHOD["refresh"]="GET"
+
+echo "Generating auth route files..."
+
+for NAME in "${ROUTES[@]}"; do
+  DIR="$API_PATH/$NAME"
+  mkdir -p "$DIR"
+
+  echo "export { ${MAP[$NAME]} as ${METHOD[$NAME]} } from \"@/modules/auth\";" \
+    > "$DIR/route.ts"
+
+  echo "✔ $DIR/route.ts created"
+done
+
+echo "Done!"
+```
+
+### 사용 방법:
+
+1. README에서 위 스크립트를 그대로 복사하여 실행
+
+생성되는 파일들은 다음과 같으며, auth모듈의 server폴더내의 route코드를 반영합니다.
+
+- src/app/api/auth/login/route.ts → POST
+- src/app/api/auth/logout/route.ts → POST
+- src/app/api/auth/me/route.ts → GET
+- src/app/api/auth/refresh/route.ts → GET
