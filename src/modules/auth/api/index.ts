@@ -31,3 +31,35 @@ export async function getUser(): Promise<AuthUser | null> {
   const data = await res.json();
   return data.user ?? null;
 }
+
+let refreshingPromise: Promise<boolean> | null = null;
+
+/**
+ * accessToken 갱신 함수
+ * - 동시에 여러 401이 터져도 refresh는 1번만 실행되도록 큐잉
+ * - 성공 시 true, 실패 시 false
+ */
+export async function refreshAccessToken(): Promise<boolean> {
+  if (!refreshingPromise) {
+    refreshingPromise = (async () => {
+      try {
+        const res = await fetch("/api/auth/refresh", {
+          method: "POST",
+          credentials: "include",
+        });
+
+        // 미들웨어와 동일하게, ok 면 Set-Cookie 로 accessToken 재발급됐다고 가정
+        if (!res.ok) return false;
+
+        return true;
+      } catch (e) {
+        console.error("refreshAccessToken error", e);
+        return false;
+      } finally {
+        refreshingPromise = null;
+      }
+    })();
+  }
+
+  return refreshingPromise;
+}

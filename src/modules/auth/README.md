@@ -15,10 +15,11 @@ React Query와 Next.js API Route를 활용하여 인증 상태를 안정적으�
 4. [Types](#types)
 5. [Utils](#utils)
 6. [Middleware 연동](#middleware)
-7. [사용법](#usage)
-8. [Playground 페이지](#playground)
-9. [참고 사항](#notes)
-10. [로컬 실행 방법](#run-local)
+7. [Next 내부 서버 구축](#server)
+8. [사용법](#usage)
+9. [Playground 페이지](#playground)
+10. [참고 사항](#notes)
+11. [로컬 실행 방법](#run-local)
 
 ---
 
@@ -27,18 +28,26 @@ React Query와 Next.js API Route를 활용하여 인증 상태를 안정적으�
 ## 📁 구조
 
 ```bash
-/src/modules/auth/
+./src/modules/auth
 |-- README.md
-|-- index.ts
 |-- api
 |   `-- index.ts
 |-- hooks
+|   |-- useAuthMutation.tsx
+|   |-- useAuthQuery.tsx
 |   |-- useLogin.ts
 |   |-- useLogout.ts
 |   `-- useUserInfo.ts
+|-- index.ts
+|-- server
+|   |-- loginRoute.ts
+|   |-- logoutRoute.ts
+|   |-- meRoute.ts
+|   `-- refreshRoute.ts
 |-- types
 |   `-- index.ts
 `-- utils
+    |-- getHttpStatus.ts
     |-- jwt.ts
     `-- middleware.ts
 ```
@@ -47,6 +56,8 @@ React Query와 Next.js API Route를 활용하여 인증 상태를 안정적으�
   로그인, 로그아웃, 사용자 정보 조회를 담당하는 API 함수들
 - **hooks/**  
   React Query 기반의 인증 관련 훅 (로그인/로그아웃/유저 정보)
+- **server/**  
+  테스트용 임시 서버 구축을 위한 서버사이드 코드
 - **types/**  
   JWT Payload, Auth User 등 인증 데이터 타입 정의
 - **utils/**  
@@ -117,6 +128,46 @@ export async function getUser(): Promise<AuthUser | null> {
 }
 ```
 
+### ✔ refreshAccessToken()
+
+Refresh토큰을 이용해 Access토큰을 재발급 하는 POST /api/auth/refresh 호출.
+
+Refresh토큰 만료 -> false 반환
+
+Access토큰 재발급 성공 -> true 반환
+
+```tsx
+/**
+ * accessToken 갱신 함수
+ * - 동시에 여러 401이 터져도 refresh는 1번만 실행되도록 큐잉
+ * - 성공 시 true, 실패 시 false
+ */
+export async function refreshAccessToken(): Promise<boolean> {
+  if (!refreshingPromise) {
+    refreshingPromise = (async () => {
+      try {
+        const res = await fetch("/api/auth/refresh", {
+          method: "POST",
+          credentials: "include",
+        });
+
+        // 미들웨어와 동일하게, ok 면 Set-Cookie 로 accessToken 재발급됐다고 가정
+        if (!res.ok) return false;
+
+        return true;
+      } catch (e) {
+        console.error("refreshAccessToken error", e);
+        return false;
+      } finally {
+        refreshingPromise = null;
+      }
+    })();
+  }
+
+  return refreshingPromise;
+}
+```
+
 ---
 
 <a id="hooks"></a>
@@ -143,6 +194,20 @@ export async function getUser(): Promise<AuthUser | null> {
 - 내부적으로 `getUser()`를 사용하는 Query 훅
 - 토큰이 없거나 검증 실패 시 null 반환
 - 다른 컴포넌트에서 user 존재 여부로 인증/비인증 UI 분기
+
+`useAuthQuery`
+
+- `useQuery`를 매핑하여 Auth로직을 넣은 Query 훅
+- 서버 통신 중 401에러 발생시 refresh로직으로 토큰 재발급
+- refresh로직 실패했을 때 강제 로그아웃 처리
+- 토큰이 필요한 API요청 시 필요한 Query 훅
+
+`useAuthMutation`
+
+- `useMutation`를 매핑하여 Auth로직을 넣은 Mutation 훅
+- 서버 통신 중 401에러 발생시 refresh로직으로 토큰 재발급
+- refresh로직 실패했을 때 강제 로그아웃 처리
+- 토큰이 필요한 API요청 시 필요한 Mutation 훅
 
 ---
 
@@ -289,6 +354,39 @@ export async function handleAuthMiddleware(req: NextRequest) {
 }
 ```
 
+### getHttpStatus.ts
+
+- 역할
+  - API통신시 반환된 서버의 API상태 코드를 반환하는 함수
+
+제공 함수(예시)
+
+```tsx
+import axios from "axios";
+
+export function getHttpStatus(error: unknown): number | null {
+  // axios 에러
+  if (axios.isAxiosError(error)) {
+    return error.response?.status ?? null;
+  }
+
+  // fetch 사용 시 Response 객체 직접 던지는 경우
+  if (error instanceof Response) {
+    return error.status;
+  }
+
+  // 기타 커스텀 에러 구조에서 status 필드만 있는 경우
+  if (typeof error === "object" && error !== null) {
+    const anyError = error as { status?: number };
+    if (typeof anyError.status === "number") {
+      return anyError.status;
+    }
+  }
+
+  return null;
+}
+```
+
 ---
 
 <a id="middleware"></a>
@@ -350,6 +448,62 @@ export const config = {
      - /api/auth/login, /api/auth/refresh, /api/auth/logout 등에서 다시 토큰을 세팅/검증하는데 이 요청이 또다시 미들웨어를 타면 무한 루프 혹은 예기치 않은 인증 로직 중복이 발생할 수 있습니다.
 
    - \_next/static, \_next/image, favicon.ico 등 정적 리소스도 제외합니다.
+
+---
+
+<a id="server"></a>
+
+## 🧱Next 내부 서버 구축 (+Optional)
+
+아직 서버 API가 개발되지 않았거나, 프론트에서 자체적인 테스트가 필요할 때 활용.
+
+login, logout, userInfo, refresh 기능을 하는 API를 대체할 수 있습니다.
+
+1. route.ts 생성
+
+- Next.js의 서버 코드를 구현하기 위해 폴더 구조를 생성한다.
+
+```shell
+./src/app/api
+`-- auth
+    |-- login
+    |   `-- route.ts
+    |-- logout
+    |   `-- route.ts
+    |-- me
+    |   `-- route.ts
+    `-- refresh
+        `-- route.ts
+```
+
+2. 각각의 endpoint에 맞는 서버 구현 코드 참조
+
+```tsx
+// login/route.ts
+export { loginRoute as POST } from "@/modules/auth";
+```
+
+```tsx
+// logout/route.ts
+export { logoutRoute as POST } from "@/modules/auth";
+```
+
+```tsx
+// me/route.ts
+export { meRoute as GET } from "@/modules/auth";
+```
+
+```tsx
+// refresh/route.ts
+export { refreshRoute as GET } from "@/modules/auth";
+```
+
+각각 아래에 해당하는 endpoint를 가진다.
+
+- login/route.ts -> `/api/auth/login`
+- logout/route.ts -> `/api/auth/logout`
+- me/route.ts -> `/api/auth/me`
+- refresh/route.ts -> `/api/auth/refresh`
 
 ---
 

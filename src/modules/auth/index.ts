@@ -5,6 +5,8 @@ export * from "./api";
 export { useLogin } from "./hooks/useLogin";
 export { useLogout } from "./hooks/useLogout";
 export { useUserInfo } from "./hooks/useUserInfo";
+export { useAuthQuery } from "./hooks/useAuthQuery";
+export { useAuthMutation } from "./hooks/useAuthMutation";
 
 // Types
 export * from "./types";
