@@ -1,3 +1,4 @@
+"use client";
 import { useMutation, useQueryClient } from "react-query";
 
 import { login } from "../api";
